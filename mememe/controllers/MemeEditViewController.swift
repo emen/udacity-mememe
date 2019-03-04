@@ -1,5 +1,5 @@
 //
-//  MemeMeEditViewController.swift
+//  MemeEditViewController.swift
 //
 //  Created by Emen Zhao on 3/2/19.
 //  Copyright © 2019 Emen Zhao. All rights reserved.
@@ -7,9 +7,7 @@
 
 import UIKit
 
-
-
-// MARK: - MememeEditViewController
+// MARK: - MemeEditViewController
 
 class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -34,7 +32,6 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
         NSAttributedString.Key.strokeWidth: 0
     ]
-    
     
     // MARK: Top Tool Bar Buttons
     
@@ -87,6 +84,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     @objc func cancel(_ sender: Any) {
         topText.text = defaultTopText
         bottomText.text = defaultBottomText
+        topTextFieldDelegate.resetHasUserInput()
+        bottomTextFieldDelegate.resetHasUserInput()
         meImage.image = nil
         actionButton.isEnabled = false
     }

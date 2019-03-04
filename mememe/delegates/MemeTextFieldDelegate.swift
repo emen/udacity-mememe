@@ -31,5 +31,9 @@ class MemeTextFieldDelegate: NSObject, UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+
+    func resetHasUserInput() {
+        self.hasUserInput = false
+    }
 }
 
