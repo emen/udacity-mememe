@@ -44,16 +44,16 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        meImage.contentMode = .scaleAspectFill
+        meImage.contentMode = .scaleAspectFit
         setupTextField(topText, withText: defaultTopText, withDelegate: topTextFieldDelegate)
         setupTextField(bottomText, withText: defaultBottomText, withDelegate: bottomTextFieldDelegate)
         topToolBar.items = [actionButton, topSpace, cancelButton]
         actionButton.isEnabled = false
+        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         subscribeToKeyboardNotification()
     }
     
@@ -76,7 +76,11 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         let memedImage = generateMemedImage()
         let controller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         controller.completionWithItemsHandler = {(activity, success, items, error) in
-            self.save()
+            if success {
+                self.save()
+            }
+
+            self.dismiss(animated: true, completion: nil)
         }
         present(controller, animated: true, completion: nil)
     }
@@ -97,9 +101,10 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-        meImage.image = image
-        actionButton.isEnabled = true
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            meImage.image = image
+            actionButton.isEnabled = true
+        }
         dismiss(animated: true, completion: nil)
     }
     
@@ -112,7 +117,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     @objc func keyboardWillShow(_ notification: Notification) {
-        if bottomText.isEditing {
+        if bottomText.isFirstResponder {
             view.frame.origin.y -= getKeyboardHeight(notification)
         }
     }
@@ -134,16 +139,14 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     func generateMemedImage() -> UIImage {
         
-        topToolBar.isHidden = true
-        bottomToolBar.isHidden = true
+        hideToolBar(true)
         
         UIGraphicsBeginImageContext(self.view.frame.size)
         view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
         let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
-        topToolBar.isHidden = false
-        bottomToolBar.isHidden = false
+        hideToolBar(false)
         
         return memedImage
     }
@@ -167,5 +170,10 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         textField.autocapitalizationType = .allCharacters
         textField.text = text
         textField.textAlignment = .center
+    }
+
+    private func hideToolBar(_ hide: Bool) {
+        topToolBar.isHidden = hide
+        bottomToolBar.isHidden = hide
     }
 }
