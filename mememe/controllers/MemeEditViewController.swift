@@ -15,8 +15,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     @IBOutlet private weak var meImage: UIImageView!
     @IBOutlet private weak var cameraButton: UIBarButtonItem!
-    @IBOutlet private weak var topText: UITextField!
-    @IBOutlet private weak var bottomText: UITextField!
+    @IBOutlet private weak var topText: MemeTextField!
+    @IBOutlet private weak var bottomText: MemeTextField!
     @IBOutlet weak var topToolBar: UIToolbar!
     @IBOutlet weak var bottomToolBar: UIToolbar!
     
@@ -24,14 +24,6 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     private let defaultTopText = "TOP"
     private let defaultBottomText = "BOTTOM"
-    private let topTextFieldDelegate = MemeTextFieldDelegate()
-    private let bottomTextFieldDelegate = MemeTextFieldDelegate()
-    private let textAttributes: [NSAttributedString.Key: Any] = [
-        NSAttributedString.Key.strokeColor: UIColor.black,
-        NSAttributedString.Key.foregroundColor: UIColor.white,
-        NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
-        NSAttributedString.Key.strokeWidth: 0
-    ]
     
     // MARK: Top Tool Bar Buttons
     
@@ -45,8 +37,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         meImage.contentMode = .scaleAspectFit
-        setupTextField(topText, withText: defaultTopText, withDelegate: topTextFieldDelegate)
-        setupTextField(bottomText, withText: defaultBottomText, withDelegate: bottomTextFieldDelegate)
+        topText.setDefaultText(text: defaultTopText)
+        bottomText.setDefaultText(text: defaultBottomText)
         topToolBar.items = [actionButton, topSpace, cancelButton]
         actionButton.isEnabled = false
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
@@ -86,10 +78,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     @objc func cancel(_ sender: Any) {
-        topText.text = defaultTopText
-        bottomText.text = defaultBottomText
-        topTextFieldDelegate.resetHasUserInput()
-        bottomTextFieldDelegate.resetHasUserInput()
+        topText.reset()
+        bottomText.reset()
         meImage.image = nil
         actionButton.isEnabled = false
     }
@@ -152,7 +142,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     func save() {
-        _ = Meme(topText: topText.text!, bottomText: bottomText.text!, originalImage: meImage.image!, memedImage: generateMemedImage())
+        let _ = Meme(topText: topText.text!, bottomText: bottomText.text!, originalImage: meImage.image!, memedImage: generateMemedImage())
     }
     
     // MARK: private methods
@@ -162,14 +152,6 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         controller.sourceType = type
         controller.delegate = self
         return controller
-    }
-    
-    private func setupTextField(_ textField: UITextField, withText text: String, withDelegate delegate: MemeTextFieldDelegate) {
-        textField.defaultTextAttributes = textAttributes
-        textField.delegate = delegate
-        textField.autocapitalizationType = .allCharacters
-        textField.text = text
-        textField.textAlignment = .center
     }
 
     private func hideToolBar(_ hide: Bool) {
