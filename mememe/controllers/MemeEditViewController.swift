@@ -82,6 +82,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         bottomText.reset()
         meImage.image = nil
         actionButton.isEnabled = false
+        dismiss(animated: true, completion: nil)
     }
     
     // MARK: Delegates
@@ -142,7 +143,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     func save() {
-        let _ = Meme(topText: topText.text!, bottomText: bottomText.text!, originalImage: meImage.image!, memedImage: generateMemedImage())
+        let meme = Meme(topText: topText.text!, bottomText: bottomText.text!, originalImage: meImage.image!, memedImage: generateMemedImage())
+        (UIApplication.shared.delegate as! AppDelegate).memes.append(meme)
     }
     
     // MARK: private methods
